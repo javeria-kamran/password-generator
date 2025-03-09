@@ -3,6 +3,7 @@ from streamlit_option_menu import option_menu
 from utils.checker import PasswordAnalyzer
 from utils.generator  import PasswordGenerator
 import time
+import streamlit.components.v1 as components
 
 # Configure page
 st.set_page_config(
@@ -165,13 +166,31 @@ def main():
                 </div>
                 """, unsafe_allow_html=True)
                 
-                # Copy functionality
-                st.markdown(f"""
-                <button onclick="navigator.clipboard.writeText('{password}')" 
-                    style="background: #2ECC71; color: white; border: none; padding: 8px 16px; border-radius: 5px; margin-top: 10px;">
-                    Copy to Clipboard
-                </button>
-                """, unsafe_allow_html=True)
+                # Inject HTML and JavaScript for copy-to-clipboard functionality
+                html_code = f"""
+                <html>
+                  <head>
+                    <meta charset="utf-8">
+                  </head>
+                  <body>
+                    <button id="copy-btn" 
+                            style="background: #2ECC71; color: white; border: none; padding: 8px 16px; 
+                                   border-radius: 5px; margin-top: 10px;">
+                        Copy to Clipboard
+                    </button>
+                    <script>
+                      document.getElementById("copy-btn").addEventListener("click", function() {{
+                        navigator.clipboard.writeText("{password}").then(function() {{
+                          alert("Copied to clipboard!");
+                        }}, function(err) {{
+                          alert("Failed to copy: " + err);
+                        }});
+                      }});
+                    </script>
+                  </body>
+                </html>
+                """
+                components.html(html_code, height=150)
 
     elif choice == "Documentation":
         st.header("📚 Security Documentation")
